@@ -9,10 +9,14 @@ import com.javidev.proyectopmdm.databinding.ActivityFavoritesBinding
 import com.javidev.proyectopmdm.ui.adapter.AnimeAdapter
 import com.javidev.proyectopmdm.ui.viewmodel.AnimeViewModel
 
+/**
+ * Pantalla que muestra la lista de animes guardados en favoritos.
+ * Obtiene los datos desde Room y los muestra en un RecyclerView.
+ */
 class FavoritesActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFavoritesBinding
-    private val animeViewModel: AnimeViewModel by viewModels()
+    private val animeViewModel: AnimeViewModel by viewModels() // ViewModel para obtener los favoritos
     private lateinit var adapter: AnimeAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,15 +24,15 @@ class FavoritesActivity : AppCompatActivity() {
         binding = ActivityFavoritesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Configurar RecyclerView
+        // Configurar RecyclerView para mostrar los favoritos en una cuadrícula de 2 columnas
         adapter = AnimeAdapter(isFavoriteList = true)
         binding.recyclerViewFavorites.layoutManager = GridLayoutManager(this, 2)
         binding.recyclerViewFavorites.adapter = adapter
 
-        // Observar los datos guardados en Room
+        // Observar los datos guardados en Room y actualizar la lista en la pantalla
         animeViewModel.savedAnimes.observe(this) { animes ->
             Log.d("AnimeDebug", "Lista de favoritos desde Room: $animes")
-            adapter.submitList(animes) // Actualiza la RecyclerView
+            adapter.submitList(animes)
         }
     }
 }

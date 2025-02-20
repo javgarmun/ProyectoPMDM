@@ -17,11 +17,15 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**
+ * Pantalla de detalles de un anime.
+ * Permite visualizar información detallada y guardar/eliminar el anime de favoritos.
+ */
 class AnimeDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAnimeDetailBinding
-    private val animeViewModel: AnimeViewModel by viewModels() // ✅ Sigue siendo necesario para guardar favoritos
-    private var anime: Any? = null // ✅ Para almacenar el anime actual (de la API o Room)
+    private val animeViewModel: AnimeViewModel by viewModels() // ViewModel para manejar favoritos
+    private var anime: Any? = null // Variable que almacena el anime actual (de la API o Room)
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,24 +33,25 @@ class AnimeDetailActivity : AppCompatActivity() {
         binding = ActivityAnimeDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Obtener el JSON desde el Intent
+        // Obtener el JSON del anime desde el Intent
         val animeJson = intent.getStringExtra("anime_json")
         Log.d("AnimeDebug", "JSON recibido: $animeJson")
 
         if (animeJson != null) {
-            // Configurar Moshi para convertir ambos tipos de objetos
+            // Convertir el JSON a un objeto Anime o AnimeEntity con Moshi
             val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
             val jsonAdapterAnime = moshi.adapter(Anime::class.java)
             val jsonAdapterEntity = moshi.adapter(AnimeEntity::class.java)
 
             anime = try {
-                jsonAdapterAnime.fromJson(animeJson) // ✅ Intenta convertir como `Anime`
+                jsonAdapterAnime.fromJson(animeJson) // Intentar convertir a `Anime`
             } catch (e: Exception) {
-                jsonAdapterEntity.fromJson(animeJson) // ✅ Si falla, intenta como `AnimeEntity`
+                jsonAdapterEntity.fromJson(animeJson) // Si falla, intentar con `AnimeEntity`
             }
 
             Log.d("AnimeDebug", "Objeto deserializado: $anime")
 
+            // Mostrar los detalles del anime en la pantalla
             anime?.let {
                 when (it) {
                     is Anime -> mostrarDetalles(
@@ -69,17 +74,17 @@ class AnimeDetailActivity : AppCompatActivity() {
             Toast.makeText(this, "Error: No se pudo cargar el anime", Toast.LENGTH_SHORT).show()
         }
 
-        // Configurar el estado inicial del botón
+        // Configurar el estado del botón de favoritos según si el anime ya está guardado
         if (anime is AnimeEntity) {
             binding.saveAnimeButton.text = "Eliminar de favoritos"
         } else {
             binding.saveAnimeButton.text = "Guardar en favoritos"
         }
 
-        // Guardar o eliminar de favoritos y deshabilitar el botón
+        // Guardar o eliminar de favoritos y deshabilitar el botón tras la acción
         binding.saveAnimeButton.setOnClickListener {
             when (anime) {
-                is Anime -> { // ✅ Guardar en favoritos
+                is Anime -> { // Guardar en favoritos
                     val animeData = anime as Anime
                     val animeEntity = AnimeEntity(
                         malId = animeData.mal_id,
@@ -93,32 +98,32 @@ class AnimeDetailActivity : AppCompatActivity() {
                     )
 
                     Log.d("AnimeDebug", "Guardando en favoritos: $animeEntity")
-                    animeViewModel.saveAnime(animeEntity) // ✅ Guardar en Room
+                    animeViewModel.saveAnime(animeEntity)
                     Toast.makeText(this, "Anime guardado en favoritos", Toast.LENGTH_SHORT).show()
 
-                    binding.saveAnimeButton.isEnabled =
-                        false // 🔥 Deshabilitar el botón tras guardar
+                    binding.saveAnimeButton.isEnabled = false // Deshabilitar el botón
                 }
 
-                is AnimeEntity -> { // ✅ Eliminar de favoritos
+                is AnimeEntity -> { // Eliminar de favoritos
                     val animeEntity = anime as AnimeEntity
                     Log.d("AnimeDebug", "Eliminando de favoritos: $animeEntity")
-                    animeViewModel.deleteAnime(animeEntity) // ✅ Eliminar de Room
+                    animeViewModel.deleteAnime(animeEntity)
                     Toast.makeText(this, "Anime eliminado de favoritos", Toast.LENGTH_SHORT).show()
 
-                    binding.saveAnimeButton.isEnabled =
-                        false // 🔥 Deshabilitar el botón tras eliminar
+                    binding.saveAnimeButton.isEnabled = false // Deshabilitar el botón
                 }
             }
         }
 
-
-        // Botón de volver atrás
+        // Botón para regresar a la pantalla anterior
         binding.backButton.setOnClickListener {
             finish()
         }
     }
 
+    /**
+     * Muestra los detalles del anime en la interfaz.
+     */
     @SuppressLint("SetTextI18n")
     private fun mostrarDetalles(
         title: String, titleEnglish: String?, type: String?, score: Double?, episodes: Int?,
@@ -152,13 +157,15 @@ class AnimeDetailActivity : AppCompatActivity() {
             .into(binding.animeImage)
     }
 
+    /**
+     * Convierte una fecha de formato "yyyy-MM-dd'T'HH:mm:ssXXX" a "dd/MM/yyyy".
+     */
     private fun formatDate(dateString: String?): String {
         if (dateString.isNullOrEmpty()) return "Desconocido"
 
         return try {
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
-            val outputFormat =
-                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) // Formato DD/MM/AAAA
+            val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val date = inputFormat.parse(dateString)
             date?.let { outputFormat.format(it) } ?: "Desconocido"
         } catch (e: Exception) {

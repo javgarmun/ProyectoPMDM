@@ -12,9 +12,13 @@ import com.javidev.proyectopmdm.databinding.ActivityMainBinding
 import com.javidev.proyectopmdm.ui.adapter.AnimeAdapter
 import com.javidev.proyectopmdm.ui.viewmodel.AnimeViewModel
 
+/**
+ * Pantalla principal de la aplicación.
+ * Muestra la lista de animes obtenidos de la API y permite la búsqueda y paginación.
+ */
 class MainActivity : AppCompatActivity() {
 
-    private val animeViewModel: AnimeViewModel by viewModels()
+    private val animeViewModel: AnimeViewModel by viewModels() // ViewModel para manejar la lógica de datos
     private lateinit var binding: ActivityMainBinding
     private lateinit var animeAdapter: AnimeAdapter
 
@@ -23,10 +27,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Configuración del RecyclerView para mostrar los animes en una cuadrícula de 2 columnas
         animeAdapter = AnimeAdapter(mutableListOf())
         binding.recyclerViewAnime.layoutManager = GridLayoutManager(this, 2)
         binding.recyclerViewAnime.adapter = animeAdapter
 
+        // Observar los datos de la API y actualizar la lista en pantalla
         animeViewModel.animeList.observe(this) { animes ->
             Log.d("AnimeDebug", "Lista de animes cargados desde API: $animes")
             animeAdapter.updateList(animes ?: emptyList())
@@ -37,10 +43,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Cargar la primera página de Top Animes
+        // Cargar la primera página de animes populares al iniciar la app
         animeViewModel.fetchTopAnimes()
 
-        // Detectar búsqueda
+        // Detectar búsqueda de animes
         binding.searchButton.setOnClickListener {
             val query = binding.searchEditText.text.toString()
             if (query.isNotEmpty()) {
@@ -48,6 +54,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Restaurar la lista de animes si el campo de búsqueda queda vacío
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 if (s.isNullOrEmpty()) {
@@ -59,11 +66,11 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // Botones de navegación entre páginas
+        // Botones para navegar entre páginas de animes
         binding.prevPageButton.setOnClickListener { animeViewModel.previousPage() }
         binding.nextPageButton.setOnClickListener { animeViewModel.nextPage() }
 
-        // Botón para ver favoritos
+        // Botón para ver la lista de favoritos guardados en Room
         binding.buttonFavorites.setOnClickListener {
             val intent = Intent(this, FavoritesActivity::class.java)
             startActivity(intent)

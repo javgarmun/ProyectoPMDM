@@ -9,12 +9,15 @@ import com.javidev.proyectopmdm.data.model.Anime
 import com.javidev.proyectopmdm.data.repository.AnimeRepository
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel que maneja la lógica de la aplicación y la comunicación entre la UI y los datos.
+ */
 class AnimeViewModel(application: Application) : AndroidViewModel(application) {
 
-    val animeList = MutableLiveData<List<Anime>>()
-    private var isSearching = false
-    var currentPage = 1
-    private var lastPage = 1146 // Límite según la API
+    val animeList = MutableLiveData<List<Anime>>() // Lista de animes obtenidos de la API
+    private var isSearching = false // Controla si se está realizando una búsqueda
+    var currentPage = 1 // Página actual en la paginación de la API
+    private var lastPage = 1146 // Última página disponible en la API
 
     private val repository: AnimeRepository
 
@@ -23,9 +26,12 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
         repository = AnimeRepository(database.animeDao(), RetrofitInstance.api)
     }
 
-    // Obtiene los datos de los animes guardados en caché
+    // Obtiene los animes guardados como favoritos en la base de datos local
     val savedAnimes: LiveData<List<AnimeEntity>> = repository.getFavorites().asLiveData()
 
+    /**
+     * Obtiene la lista de animes desde la API y la almacena en `animeList`.
+     */
     fun fetchTopAnimes(page: Int = 1) {
         if (isSearching) return
 
@@ -39,7 +45,9 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
+    /**
+     * Avanza a la siguiente página en la paginación de la API.
+     */
     fun nextPage() {
         if (!isSearching && currentPage < lastPage) {
             currentPage++
@@ -47,6 +55,9 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Retrocede a la página anterior en la paginación de la API.
+     */
     fun previousPage() {
         if (!isSearching && currentPage > 1) {
             currentPage--
@@ -54,12 +65,14 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Busca un anime por nombre en la API y actualiza `animeList` con los resultados.
+     */
     fun searchAnime(query: String) {
         viewModelScope.launch {
             try {
                 isSearching = true
                 val response = RetrofitInstance.api.searchAnime(query)
-
                 animeList.postValue(response.data)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -69,17 +82,26 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Reinicia la lista de animes mostrando los animes mejor valorados desde la API.
+     */
     fun resetAnimeList() {
         isSearching = false
         fetchTopAnimes(1)
     }
 
+    /**
+     * Guarda un anime en la lista de favoritos.
+     */
     fun saveAnime(anime: AnimeEntity) {
         viewModelScope.launch {
             repository.saveAnime(anime)
         }
     }
 
+    /**
+     * Elimina un anime de la lista de favoritos.
+     */
     fun deleteAnime(anime: AnimeEntity) {
         viewModelScope.launch {
             repository.deleteAnime(anime)
