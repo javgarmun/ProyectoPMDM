@@ -14,10 +14,6 @@ interface AnimeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAnime(anime: AnimeEntity)
 
-    // Insertar una lista de animes en la base de datos (para agregar varios a la vez)
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAnimeList(animes: List<AnimeEntity>)
-
     // Obtener todos los animes guardados en la base de datos (favoritos)
     @Query("SELECT * FROM anime_table")
     fun getAllAnimes(): Flow<List<AnimeEntity>>

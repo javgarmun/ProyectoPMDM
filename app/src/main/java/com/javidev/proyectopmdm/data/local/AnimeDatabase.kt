@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 /**
  * Base de datos de Room que gestiona la tabla de animes guardados como favoritos.
  */
-@Database(entities = [AnimeEntity::class], version = 1, exportSchema = false)
+@Database(entities = [AnimeEntity::class], version = 2, exportSchema = false)
 abstract class AnimeDatabase : RoomDatabase() {
 
     // DAO para acceder a las operaciones de la base de datos

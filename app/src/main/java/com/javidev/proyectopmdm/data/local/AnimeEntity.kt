@@ -15,5 +15,10 @@ data class AnimeEntity(
     val type: String?, // Tipo de anime (TV, OVA, Película, etc.)
     val episodes: Int?, // Número de episodios (puede ser desconocido)
     val score: Double?, // Puntuación del anime
-    val synopsis: String? // Sinopsis del anime
+    val synopsis: String?, // Sinopsis del anime
+    val status: String?, // Estado del anime
+    val airedFrom: String?, // Fecha de estreno
+    val airedTo: String?, // Fecha de finalización
+    val genres: String?, // Géneros del anime
+    val studios: String? // Estudios de animación
 )

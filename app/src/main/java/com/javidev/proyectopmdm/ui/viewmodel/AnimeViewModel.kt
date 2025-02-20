@@ -15,9 +15,13 @@ import kotlinx.coroutines.launch
 class AnimeViewModel(application: Application) : AndroidViewModel(application) {
 
     val animeList = MutableLiveData<List<Anime>>() // Lista de animes obtenidos de la API
-    private var isSearching = false // Controla si se está realizando una búsqueda
+
     var currentPage = 1 // Página actual en la paginación de la API
-    private var lastPage = 1146 // Última página disponible en la API
+    private var lastPage = 1
+
+    private var isSearching = false // Controla si se está realizando una búsqueda
+    private var currentSearchQuery: String? = null // Guarda el término de búsqueda actual
+
 
     private val repository: AnimeRepository
 
@@ -37,13 +41,18 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                val animes = repository.getAnimesFromApi(page)
-                animeList.postValue(animes)
+                val response = RetrofitInstance.api.getTopAnimes(page) // Llamada a la API
+
+                // Guardar la cantidad real de páginas desde la API
+                lastPage = response.pagination.lastVisiblePage
+
+                animeList.postValue(response.data)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
+
 
     /**
      * Avanza a la siguiente página en la paginación de la API.
@@ -51,7 +60,11 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
     fun nextPage() {
         if (!isSearching && currentPage < lastPage) {
             currentPage++
-            fetchTopAnimes(currentPage)
+            if (currentSearchQuery != null) {
+                searchAnime(currentSearchQuery!!, currentPage) // Continúa la búsqueda
+            } else {
+                fetchTopAnimes(currentPage) // Si no hay búsqueda, carga animes normales
+            }
         }
     }
 
@@ -61,19 +74,26 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
     fun previousPage() {
         if (!isSearching && currentPage > 1) {
             currentPage--
-            fetchTopAnimes(currentPage)
+            if (currentSearchQuery != null) {
+                searchAnime(currentSearchQuery!!, currentPage) // Continúa la búsqueda
+            } else {
+                fetchTopAnimes(currentPage) // Si no hay búsqueda, carga animes normales
+            }
         }
     }
 
     /**
      * Busca un anime por nombre en la API y actualiza `animeList` con los resultados.
      */
-    fun searchAnime(query: String) {
+    fun searchAnime(query: String, page: Int = 1) {
         viewModelScope.launch {
             try {
                 isSearching = true
-                val response = RetrofitInstance.api.searchAnime(query)
+                currentSearchQuery = query // Guarda el término de búsqueda actual
+                val response = RetrofitInstance.api.searchAnime(query, page)
                 animeList.postValue(response.data)
+                lastPage =
+                    response.pagination.lastVisiblePage // Actualiza el número real de páginas
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -81,6 +101,7 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
 
     /**
      * Reinicia la lista de animes mostrando los animes mejor valorados desde la API.
