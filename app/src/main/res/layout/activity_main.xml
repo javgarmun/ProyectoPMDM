@@ -4,15 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.MainActivity"
-    android:padding="8dp">
+    android:padding="8dp"
+    tools:context=".ui.MainActivity">
 
     <!-- Barra de búsqueda -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:paddingBottom="8dp">
+        android:padding="8dp">
 
         <EditText
             android:id="@+id/searchEditText"
@@ -21,19 +22,61 @@
             android:layout_weight="1"
             android:hint="Buscar anime..."
             android:inputType="text"
-            android:padding="8dp"/>
+            android:padding="8dp" />
 
         <Button
             android:id="@+id/searchButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Buscar"/>
+            android:text="Buscar" />
     </LinearLayout>
+
+    <!-- Botón para ver favoritos -->
+    <Button
+        android:id="@+id/buttonFavorites"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@android:color/holo_blue_light"
+        android:padding="8dp"
+        android:text="Ver favoritos"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
 
     <!-- RecyclerView para mostrar la lista de animes -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewAnime"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp" />
+
+    <!-- Controles de paginación -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <Button
+            android:id="@+id/prevPageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Anterior" />
+
+        <TextView
+            android:id="@+id/pageNumberText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Página 1" />
+
+        <Button
+            android:id="@+id/nextPageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Siguiente" />
+    </LinearLayout>
+
 </LinearLayout>

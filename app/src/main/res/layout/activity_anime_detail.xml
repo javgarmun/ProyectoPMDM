@@ -11,6 +11,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <Button
+            android:id="@+id/saveAnimeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Guardar en favoritos" />
+
         <ImageView
             android:id="@+id/animeImage"
             android:layout_width="match_parent"
@@ -29,6 +36,37 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/animeEnglishTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="18sp"
+            android:textStyle="italic" />
+
+
+        <TextView
+            android:id="@+id/animeType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/animeGenres"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/animeStudios"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
+
+        <TextView
             android:id="@+id/animeScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,6 +79,27 @@
             android:layout_height="wrap_content"
             android:textColor="@android:color/darker_gray"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/animeStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/animeReleaseDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/animeEndDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/animeSynopsis"

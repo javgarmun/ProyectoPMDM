@@ -1,12 +1,13 @@
 package com.javidev.proyectopmdm.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.javidev.proyectopmdm.databinding.ActivityMainBinding
 import com.javidev.proyectopmdm.ui.adapter.AnimeAdapter
 import com.javidev.proyectopmdm.ui.viewmodel.AnimeViewModel
@@ -27,11 +28,17 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerViewAnime.adapter = animeAdapter
 
         animeViewModel.animeList.observe(this) { animes ->
-            animeAdapter.updateList(animes)
+            Log.d("AnimeDebug", "Lista de animes cargados desde API: $animes")
+            animeAdapter.updateList(animes ?: emptyList())
+            binding.pageNumberText.text = "Página ${animeViewModel.currentPage}"
+
+            binding.recyclerViewAnime.post {
+                binding.recyclerViewAnime.adapter = animeAdapter
+            }
         }
 
-        // Cargar la lista infinita de animes por defecto
-        animeViewModel.fetchAnimeList()
+        // Cargar la primera página de Top Animes
+        animeViewModel.fetchTopAnimes()
 
         // Detectar búsqueda
         binding.searchButton.setOnClickListener {
@@ -41,7 +48,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Detectar si el usuario borra la búsqueda
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 if (s.isNullOrEmpty()) {
@@ -53,19 +59,14 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // Detectar scroll para cargar más animes
-        binding.recyclerViewAnime.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val layoutManager = recyclerView.layoutManager as GridLayoutManager
-                val visibleItemCount = layoutManager.childCount
-                val totalItemCount = layoutManager.itemCount
-                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+        // Botones de navegación entre páginas
+        binding.prevPageButton.setOnClickListener { animeViewModel.previousPage() }
+        binding.nextPageButton.setOnClickListener { animeViewModel.nextPage() }
 
-                if (!animeViewModel.isCurrentlySearching() && visibleItemCount + firstVisibleItemPosition >= totalItemCount) {
-                    animeViewModel.fetchAnimeList()
-                }
-            }
-        })
+        // Botón para ver favoritos
+        binding.buttonFavorites.setOnClickListener {
+            val intent = Intent(this, FavoritesActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

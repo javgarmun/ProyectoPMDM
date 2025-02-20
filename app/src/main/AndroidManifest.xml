@@ -20,6 +20,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.FavoritesActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
