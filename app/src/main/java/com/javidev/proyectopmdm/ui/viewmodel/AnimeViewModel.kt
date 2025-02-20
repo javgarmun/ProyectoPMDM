@@ -17,7 +17,7 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
     val animeList = MutableLiveData<List<Anime>>() // Lista de animes obtenidos de la API
 
     var currentPage = 1 // Página actual en la paginación de la API
-    private var lastPage = 1
+    var lastPage = 1
 
     private var isSearching = false // Controla si se está realizando una búsqueda
     private var currentSearchQuery: String? = null // Guarda el término de búsqueda actual
@@ -42,10 +42,7 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.getTopAnimes(page) // Llamada a la API
-
-                // Guardar la cantidad real de páginas desde la API
-                lastPage = response.pagination.lastVisiblePage
-
+                lastPage = response.pagination.lastVisiblePage // Actualizamos el número de páginas
                 animeList.postValue(response.data)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -89,11 +86,11 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 isSearching = true
-                currentSearchQuery = query // Guarda el término de búsqueda actual
+                currentSearchQuery = query
                 val response = RetrofitInstance.api.searchAnime(query, page)
-                animeList.postValue(response.data)
                 lastPage =
-                    response.pagination.lastVisiblePage // Actualiza el número real de páginas
+                    response.pagination.lastVisiblePage // Se actualiza la última página de búsqueda
+                animeList.postValue(response.data)
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -108,8 +105,11 @@ class AnimeViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun resetAnimeList() {
         isSearching = false
-        fetchTopAnimes(1)
+        currentSearchQuery = null // Se borra la búsqueda actual
+        currentPage = 1 // Se reinicia la paginación
+        fetchTopAnimes(1) // Se vuelve a cargar la lista de animes populares desde la API
     }
+
 
     /**
      * Guarda un anime en la lista de favoritos.

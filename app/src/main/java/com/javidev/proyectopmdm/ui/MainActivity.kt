@@ -31,10 +31,16 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerViewAnime.layoutManager = GridLayoutManager(this, 2)
         binding.recyclerViewAnime.adapter = animeAdapter
 
-        // Observar los datos de la API y actualizar la lista en pantalla
+        // Observamos la lista de animes y actualizamos la UI
         animeViewModel.animeList.observe(this) { animes ->
             animeAdapter.updateList(animes ?: emptyList())
             binding.pageNumberText.text = "Página ${animeViewModel.currentPage}"
+
+            // 🔹 Deshabilitar "Anterior" si estamos en la página 1
+            binding.prevPageButton.isEnabled = animeViewModel.currentPage > 1
+
+            // 🔹 Deshabilitar "Siguiente" si estamos en la última página
+            binding.nextPageButton.isEnabled = animeViewModel.currentPage < animeViewModel.lastPage
 
             binding.recyclerViewAnime.post {
                 binding.recyclerViewAnime.adapter = animeAdapter
@@ -56,13 +62,14 @@ class MainActivity : AppCompatActivity() {
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 if (s.isNullOrEmpty()) {
-                    animeViewModel.resetAnimeList()
+                    animeViewModel.resetAnimeList() // Ahora sí restablece la lista correctamente
                 }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+
 
         // Botones para navegar entre páginas de animes
         binding.prevPageButton.setOnClickListener { animeViewModel.previousPage() }
