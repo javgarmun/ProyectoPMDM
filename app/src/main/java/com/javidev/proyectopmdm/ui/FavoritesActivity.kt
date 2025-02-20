@@ -1,7 +1,6 @@
 package com.javidev.proyectopmdm.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -31,7 +30,6 @@ class FavoritesActivity : AppCompatActivity() {
 
         // Observar los datos guardados en Room y actualizar la lista en la pantalla
         animeViewModel.savedAnimes.observe(this) { animes ->
-            Log.d("AnimeDebug", "Lista de favoritos desde Room: $animes")
             adapter.submitList(animes)
         }
     }

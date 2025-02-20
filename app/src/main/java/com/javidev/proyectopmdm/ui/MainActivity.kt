@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -34,7 +33,6 @@ class MainActivity : AppCompatActivity() {
 
         // Observar los datos de la API y actualizar la lista en pantalla
         animeViewModel.animeList.observe(this) { animes ->
-            Log.d("AnimeDebug", "Lista de animes cargados desde API: $animes")
             animeAdapter.updateList(animes ?: emptyList())
             binding.pageNumberText.text = "Página ${animeViewModel.currentPage}"
 
